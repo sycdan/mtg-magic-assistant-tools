@@ -13,47 +13,54 @@ ID,NAME,COST,TYPE,POWER,TOUGHNESS,ORACLE,SET,RARITY,DBPRICE,LANG,RATING,ARTIST,C
 196998,Reya Dawnbringer,{6}{W}{W}{W},Legendary Creature - Angel,4,6,,Duel Decks: Divine vs. Demonic,,0.0,,0.0,,,,"Flying<br>At the beginning of your upkeep, you may return target creature card from your graveyard to the battlefield.",0,,1,0.0,,,,false,"c=heavily_played,fortrade",Tue Nov 29 21:32:00 EST 2022
 
 """
+import os
 import csv
-from decimal import Decimal
 from datetime import datetime
+from decimal import Decimal
 from sys import argv
 
-if __name__ != '__main__':
-    exit()
-
-input_file = 'all-folders.sample.csv'
+input_file = 'all-folders.csv'
+output_dir = './output'
 output_file_base = 'mtgassistant-{}.csv'
 writers = {}
 fieldnames = 'NAME,SET,COLLNUM,LANG,COUNT,PRICE,COMMENT,LOCATION,CUSTOM,OWNERSHIP,SPECIAL,DATE'.split(',')
 
 set_map = {
+    # 'PHOP': '__SKIP__',
     'AFC': 'Adventures in the Forgotten Realms Commander',
     'C20': 'Ikoria Commander',
     'CMD': 'Magic: The Gathering-Commander',
-    'NCC': 'Streets of New Capenna Commander',
-    'PHOP': '__SKIP__',
-    'PPRE': 'Promo set for Gatherer',
-    'PRES|A9': 'Avacyn Restored',
-    'TBRO': '__SKIP__',
-    'MM3': 'Modern Masters 2017 Edition',
     'MIC': 'Innistrad: Midnight Hunt Commander',
+    'MM3': 'Modern Masters 2017 Edition',
+    'NCC': 'Streets of New Capenna Commander',
+    'PPRE': 'Promo set for Gatherer',
+    'PVAN': 'Vanguard',
+    'OPC2': 'Planechase 2012 Edition',
+    'TBRO': '__SKIP__',
     'TSB': 'Time Spiral "Timeshifted"',
-    'DKM|7': 'Masters Edition II',
-    # 'PW09|31': 'Game Night 2019',  # Rise from the Grave
 }
 
 name_map = {
+    'Chaotic Aether': 'Chaotic Æther',
     'Knight of Dawn': 'Knight Of Dawn (Knight of Dawn)',
 }
 
 lang_map = {
 }
 
+if __name__ != '__main__':
+    exit()
+
+try:
+    os.mkdir(output_dir)
+except:
+    pass
+
 # FUNCTIONS
 
 def get_writer(folder_name):
     if folder_name not in writers:
-        f = open(output_file_base.replace('{}', folder_name), 'w', newline='', encoding='utf-8')
+        f = open(f"{output_dir}/{output_file_base}".replace('{}', folder_name), 'w', newline='', encoding='utf-8')
         writer = csv.DictWriter(f, fieldnames)
         writer.writeheader()
         writers[folder_name] = [f, writer]
@@ -98,12 +105,6 @@ for row in reader:
     
     date_bought = datetime.strptime(row['Date Bought'], '%Y-%m-%d')
     price_bought = Decimal(row['Price Bought'])
-    no_price = False
-    if price_bought < 0.10:
-        no_price = True    
-    if no_price:
-        price_bought = 0
-        date_bought = datetime.fromisoformat('2022-01-01')
 
     if printing == 'Foil':
         tags.append('foil')
