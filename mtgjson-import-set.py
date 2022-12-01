@@ -12,6 +12,7 @@ import datetime as dt
 import hashlib
 import json
 import os
+import re
 
 from json2xml import json2xml
 
@@ -33,7 +34,7 @@ def escape_newlines(text):
     return text.replace('\r\n', '\n').replace('\n', '<br>')
 
 def clean_set_name(name):
-    return name.replace(' ', '_')
+    return re.sub('[^a-zA-Z0-9]', '_', name)
 
 def clean_type(value):
     return value.replace('—', '-')
