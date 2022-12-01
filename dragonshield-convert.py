@@ -14,6 +14,7 @@ ID,NAME,COST,TYPE,POWER,TOUGHNESS,ORACLE,SET,RARITY,DBPRICE,LANG,RATING,ARTIST,C
 
 """
 import os
+import re
 import csv
 from datetime import datetime
 from decimal import Decimal
@@ -21,7 +22,7 @@ from sys import argv
 
 input_file = 'all-folders.csv'
 output_dir = './output'
-output_file_base = 'mtgassistant-{}.csv'
+output_file_base = '{}.csv'
 writers = {}
 fieldnames = 'NAME,SET,COLLNUM,LANG,COUNT,PRICE,COMMENT,LOCATION,CUSTOM,OWNERSHIP,SPECIAL,DATE'.split(',')
 
@@ -56,6 +57,7 @@ try:
 except:
     pass
 
+
 # FUNCTIONS
 
 def get_writer(folder_name):
@@ -69,6 +71,13 @@ def get_writer(folder_name):
 def close_output_files():
     for f in writers:
         writers[f][0].close()
+
+def render_card_number(card_number, card_name):
+    if '//' in card_name:
+        return True
+    if re.match('[a-zA-Z]', card_number):
+        return True
+    return False
 
 
 # MAIN
@@ -112,7 +121,7 @@ for row in reader:
     writer.writerow({
         'NAME': card_name,
         'SET': mapped_set_name,
-        'COLLNUM': card_number if '//' in card_name else '',
+        'COLLNUM': card_number if render_card_number(card_number, card_name) else '',
         'LANG': lang_map.get(language, language),
         'COUNT': row['Quantity'],
         'PRICE': "{:.2f}".format(price_bought),

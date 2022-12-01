@@ -8,8 +8,6 @@ Instructions:
 - Copy output XML files to ./MagicAssistantWorkspace/magiccards/MagicDB
 - Copy comment data from output files to ./MagicAssistantWorkspace/magiccards/MagicDB/tables/editions.txt
 """
-import monkeypatches
-
 import datetime as dt
 import hashlib
 import json
@@ -17,11 +15,14 @@ import os
 
 from json2xml import json2xml
 
+import monkeypatches
+
 rarity_map = {
     'rare': "Rare",
     'uncommon': "Uncommon",
     'common': "Common",
     'mythic': "Mythic Rare",
+    'special': "Special",
 }
 input_dir = './mtgjson'
 output_dir = f'./{input_dir}/output'
@@ -65,7 +66,7 @@ for input_file in os.listdir(input_dir):
     output_file = f"{output_dir}/{cleaned_set_name}.xml"
 
     # Limited Edition Alpha|LEA|1E,A|August 1993|Core|Block|Format (probably leave blank)|Alpha Edition,Alpha
-    edition_key = f"{set_name}|{set_code}||{release_date_display}|Expansion|||"
+    edition_key = f"{set_name}|{set_code}||{release_date_display}|Expansion|{set_name}||"
 
     output = dict(
         name=cleaned_set_name,
